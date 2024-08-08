@@ -15,7 +15,7 @@ with DAG(
     'youtube_data_extraction_dag',
     default_args=default_args,
     description='DAG to orchestrate AWS Glue jobs for YouTube data extraction and processing',
-    schedule_interval=None,  # No automatic scheduling
+    schedule_interval='@daily', # Schedule frequency eg: daily, Weekly, monthly
     catchup=False,
 ) as dag:
 
@@ -25,7 +25,7 @@ with DAG(
         job_name='glue_channel_ids_extraction_job',  # Glue job name
         aws_conn_id='aws_default',  # AWS connection ID from airflow
         region_name='us-east-1',  #region 
-		schedule_interval='@weekly', # Schedule frequency eg: daily, Weekly, monthly 
+	
     )
 
     glue_channel_details_extraction = GlueJobOperator(
@@ -33,7 +33,7 @@ with DAG(
         job_name='glue_channel_details_extraction_job',  # Glue job name
         aws_conn_id='aws_default',  # AWS connection ID from airflow
         region_name='us-east-1',  #region 
-		schedule_interval='@weekly', # Schedule frequency eg: daily, Weekly, monthly 
+	
     )
 
     glue_video_details_extraction = GlueJobOperator(
@@ -41,7 +41,7 @@ with DAG(
         job_name='youtube_video_details_job',  # Glue job name
         aws_conn_id='aws_default',  # AWS connection ID from airflow
         region_name='us-east-1',  #region 
-		schedule_interval='@weekly', # Schedule frequency eg: daily, Weekly, monthly 
+	
     )
 
     glue_popular_video_details_extraction = GlueJobOperator(
@@ -49,7 +49,7 @@ with DAG(
         job_name='glue_popular_video_details_extraction_job',  # Glue job name
         aws_conn_id='aws_default',  # AWS connection ID from airflow
         region_name='us-east-1',  #region 
-		schedule_interval='@weekly', # Schedule frequency eg: daily, Weekly, monthly
+	
     )
 
     # Set up task dependencies
