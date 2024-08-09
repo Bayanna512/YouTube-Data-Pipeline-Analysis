@@ -1,0 +1,323 @@
+{
+	"jobConfig": {
+		"name": "t_s3_rs_video_details",
+		"description": "",
+		"role": "arn:aws:iam::014498657303:role/service-role/AWSGlueServiceRole",
+		"command": "glueetl",
+		"version": "4.0",
+		"runtime": null,
+		"workerType": "G.1X",
+		"numberOfWorkers": 10,
+		"maxCapacity": 10,
+		"maxRetries": 0,
+		"timeout": 2880,
+		"maxConcurrentRuns": 1,
+		"security": "none",
+		"scriptName": "t_s3_rs_video_details.py",
+		"scriptLocation": "s3://aws-glue-assets-014498657303-us-east-1/scripts/",
+		"language": "python-3",
+		"spark": false,
+		"sparkConfiguration": "standard",
+		"jobParameters": [],
+		"tags": [],
+		"jobMode": "VISUAL_MODE",
+		"createdOn": "2024-08-07T11:57:48.188Z",
+		"developerMode": false,
+		"connectionsList": [
+			"Redshift connection"
+		],
+		"temporaryDirectory": "s3://aws-glue-assets-014498657303-us-east-1/temporary/",
+		"logging": true,
+		"glueHiveMetastore": true,
+		"etlAutoTuning": false,
+		"metrics": true,
+		"observabilityMetrics": true,
+		"bookmark": "job-bookmark-disable",
+		"sparkPath": "s3://aws-glue-assets-014498657303-us-east-1/sparkHistoryLogs/",
+		"flexExecution": false,
+		"minFlexWorkers": null,
+		"maintenanceWindow": null
+	},
+	"dag": {
+		"node-1723031757768": {
+			"nodeId": "node-1723031757768",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723027763522"
+			],
+			"name": "Drop Duplicates",
+			"generatedNodeName": "DropDuplicates_node1723031757768",
+			"classification": "Transform",
+			"type": "DropDuplicates",
+			"parentsValid": true,
+			"calculatedType": "",
+			"columns": [],
+			"codeGenVersion": 2
+		},
+		"node-1723031430829": {
+			"nodeId": "node-1723031430829",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723031757768"
+			],
+			"name": "Amazon Redshift",
+			"generatedNodeName": "AmazonRedshift_node1723031430829",
+			"classification": "DataSink",
+			"type": "AmazonRedshift",
+			"streamingBatchInterval": 100,
+			"data": {
+				"accessType": "connection",
+				"sourceType": "table",
+				"connection": {
+					"value": "Redshift connection",
+					"label": "Redshift connection",
+					"description": "-"
+				},
+				"schema": {
+					"value": "public",
+					"label": "public",
+					"description": null
+				},
+				"catalogDatabase": null,
+				"catalogRedshiftTable": null,
+				"catalogRedshiftSchema": null,
+				"table": {
+					"value": "video_details",
+					"label": "video_details",
+					"description": "public"
+				},
+				"catalogTable": null,
+				"tempDir": "s3://aws-glue-assets-014498657303-us-east-1/temporary/",
+				"iamRole": null,
+				"sampleQuery": null,
+				"preAction": null,
+				"postAction": null,
+				"action": "merge",
+				"tableSchema": [
+					{
+						"value": "ChannelID",
+						"label": "ChannelID",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "VideoID",
+						"label": "VideoID",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "Title",
+						"label": "Title",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "PublishDate",
+						"label": "PublishDate",
+						"description": "TIMESTAMP"
+					},
+					{
+						"value": "ViewCount",
+						"label": "ViewCount",
+						"description": "BIGINT"
+					},
+					{
+						"value": "__index_level_0__",
+						"label": "__index_level_0__",
+						"description": "BIGINT"
+					}
+				],
+				"selectedColumns": [
+					{
+						"value": "videoid",
+						"label": "videoid",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "VideoID",
+						"label": "VideoID",
+						"description": "VARCHAR"
+					}
+				],
+				"crawlerConnection": null,
+				"tablePrefix": null,
+				"upsert": false,
+				"mergeAction": "simple",
+				"mergeWhenMatched": "update",
+				"mergeWhenNotMatched": "insert",
+				"mergeClause": null,
+				"stagingTable": "public.video_details_temp_70bzwy",
+				"advancedOptions": []
+			},
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1723027755270": {
+			"nodeId": "node-1723027755270",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [],
+			"name": "Amazon S3",
+			"generatedNodeName": "AmazonS3_node1723027755270",
+			"classification": "DataSource",
+			"type": "S3",
+			"isCatalog": false,
+			"format": "parquet",
+			"paths": [
+				"s3://sphtest512/data/video_details/video_data_2024-08-01_2024-08-09.parquet"
+			],
+			"compressionType": null,
+			"exclusions": [],
+			"groupFiles": null,
+			"groupSize": null,
+			"recurse": true,
+			"maxBand": null,
+			"maxFilesInBand": null,
+			"additionalOptions": {
+				"boundedSize": null,
+				"boundedFiles": null,
+				"enableSamplePath": false,
+				"samplePath": "s3://sphtest512/data/video_details/video_data_2024-08-01_2024-08-09.parquet",
+				"boundedOption": null
+			},
+			"outputSchemas": [
+				[
+					{
+						"key": "ChannelID",
+						"fullPath": [
+							"ChannelID"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "VideoID",
+						"fullPath": [
+							"VideoID"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "Title",
+						"fullPath": [
+							"Title"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "PublishDate",
+						"fullPath": [
+							"PublishDate"
+						],
+						"type": "timestamp",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "ViewCount",
+						"fullPath": [
+							"ViewCount"
+						],
+						"type": "bigint",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "__index_level_0__",
+						"fullPath": [
+							"__index_level_0__"
+						],
+						"type": "bigint",
+						"glueStudioType": null,
+						"children": null
+					}
+				]
+			],
+			"calculatedType": "",
+			"codeGenVersion": 2,
+			"inferSchemaChanged": true
+		},
+		"node-1723027763522": {
+			"nodeId": "node-1723027763522",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723027755270"
+			],
+			"name": "Change Schema",
+			"generatedNodeName": "ChangeSchema_node1723027763522",
+			"classification": "Transform",
+			"type": "ApplyMapping",
+			"mapping": [
+				{
+					"toKey": "ChannelID",
+					"fromPath": [
+						"ChannelID"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "VideoID",
+					"fromPath": [
+						"VideoID"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "Title",
+					"fromPath": [
+						"Title"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "PublishDate",
+					"fromPath": [
+						"PublishDate"
+					],
+					"toType": "timestamp",
+					"fromType": "timestamp",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "ViewCount",
+					"fromPath": [
+						"ViewCount"
+					],
+					"toType": "long",
+					"fromType": "bigint",
+					"dropped": false
+				},
+				{
+					"toKey": "__index_level_0__",
+					"fromPath": [
+						"__index_level_0__"
+					],
+					"toType": "long",
+					"fromType": "bigint",
+					"dropped": false
+				}
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		}
+	},
+	"hasBeenSaved": false,
+	"usageProfileName": null
+}

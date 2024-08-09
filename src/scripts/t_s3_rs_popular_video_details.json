@@ -1,0 +1,308 @@
+{
+	"jobConfig": {
+		"name": "t_s3_rs_popular_video_details",
+		"description": "",
+		"role": "arn:aws:iam::014498657303:role/service-role/AWSGlueServiceRole",
+		"command": "glueetl",
+		"version": "4.0",
+		"runtime": null,
+		"workerType": "G.1X",
+		"numberOfWorkers": 10,
+		"maxCapacity": 10,
+		"maxRetries": 0,
+		"timeout": 2880,
+		"maxConcurrentRuns": 1,
+		"security": "none",
+		"scriptName": "popular_video_details.py",
+		"scriptLocation": "s3://aws-glue-assets-014498657303-us-east-1/scripts/",
+		"language": "python-3",
+		"spark": true,
+		"sparkConfiguration": "standard",
+		"jobParameters": [],
+		"tags": [],
+		"jobMode": "VISUAL_MODE",
+		"createdOn": "2024-08-08T13:07:58.226Z",
+		"developerMode": false,
+		"connectionsList": [
+			"Redshift connection"
+		],
+		"temporaryDirectory": "s3://aws-glue-assets-014498657303-us-east-1/temporary/",
+		"logging": true,
+		"glueHiveMetastore": true,
+		"etlAutoTuning": false,
+		"metrics": true,
+		"observabilityMetrics": true,
+		"bookmark": "job-bookmark-disable",
+		"sparkPath": "s3://aws-glue-assets-014498657303-us-east-1/sparkHistoryLogs/",
+		"flexExecution": false,
+		"minFlexWorkers": null,
+		"maintenanceWindow": null
+	},
+	"dag": {
+		"node-1723122300857": {
+			"nodeId": "node-1723122300857",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723122293603"
+			],
+			"name": "Amazon Redshift",
+			"generatedNodeName": "AmazonRedshift_node1723122300857",
+			"classification": "DataSink",
+			"type": "AmazonRedshift",
+			"streamingBatchInterval": 100,
+			"data": {
+				"accessType": "connection",
+				"sourceType": "table",
+				"connection": {
+					"value": "Redshift connection",
+					"label": "Redshift connection",
+					"description": "-"
+				},
+				"schema": {
+					"value": "public",
+					"label": "public",
+					"description": null
+				},
+				"catalogDatabase": null,
+				"catalogRedshiftTable": null,
+				"catalogRedshiftSchema": null,
+				"table": {
+					"value": "popular_video_details",
+					"label": "popular_video_details",
+					"description": "public"
+				},
+				"catalogTable": null,
+				"tempDir": "s3://aws-glue-assets-014498657303-us-east-1/temporary/",
+				"iamRole": null,
+				"sampleQuery": null,
+				"preAction": null,
+				"postAction": null,
+				"action": "truncate",
+				"tableSchema": [
+					{
+						"value": "channelid",
+						"label": "channelid",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "videoid",
+						"label": "videoid",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "title",
+						"label": "title",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "viewcount",
+						"label": "viewcount",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "publishdate",
+						"label": "publishdate",
+						"description": "VARCHAR"
+					}
+				],
+				"selectedColumns": [
+					{
+						"value": "ChannelID",
+						"label": "ChannelID",
+						"description": "VARCHAR"
+					},
+					{
+						"value": "VideoID",
+						"label": "VideoID",
+						"description": "VARCHAR"
+					}
+				],
+				"crawlerConnection": null,
+				"tablePrefix": null,
+				"upsert": false,
+				"mergeAction": "simple",
+				"mergeWhenMatched": "update",
+				"mergeWhenNotMatched": "insert",
+				"mergeClause": null,
+				"stagingTable": "public.popular_video_details_temp_s0xo8u",
+				"advancedOptions": []
+			},
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1723122282470": {
+			"nodeId": "node-1723122282470",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [],
+			"name": "Amazon S3",
+			"generatedNodeName": "AmazonS3_node1723122282470",
+			"classification": "DataSource",
+			"type": "S3",
+			"isCatalog": false,
+			"format": "csv",
+			"paths": [
+				"s3://sphtest512/data/popular_video_details/popular_video_details.csv"
+			],
+			"compressionType": null,
+			"exclusions": [],
+			"groupFiles": null,
+			"groupSize": null,
+			"recurse": true,
+			"maxBand": null,
+			"maxFilesInBand": null,
+			"additionalOptions": {
+				"boundedSize": null,
+				"boundedFiles": null,
+				"enableSamplePath": false,
+				"samplePath": "s3://sphtest512/data/popular_video_details/popular_video_details.csv",
+				"boundedOption": null
+			},
+			"separator": ",",
+			"escaper": "",
+			"quoteChar": "\"",
+			"multiline": null,
+			"withHeader": true,
+			"writeHeader": null,
+			"skipFirst": null,
+			"optimizePerformance": false,
+			"outputSchemas": [
+				[
+					{
+						"key": "channelid",
+						"fullPath": [
+							"channelid"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "videoid",
+						"fullPath": [
+							"videoid"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "title",
+						"fullPath": [
+							"title"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "viewcount",
+						"fullPath": [
+							"viewcount"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					},
+					{
+						"key": "publishdate",
+						"fullPath": [
+							"publishdate"
+						],
+						"type": "string",
+						"glueStudioType": null,
+						"children": null
+					}
+				]
+			],
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1723122288487": {
+			"nodeId": "node-1723122288487",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723122282470"
+			],
+			"name": "Change Schema",
+			"generatedNodeName": "ChangeSchema_node1723122288487",
+			"classification": "Transform",
+			"type": "ApplyMapping",
+			"mapping": [
+				{
+					"toKey": "channelid",
+					"fromPath": [
+						"channelid"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "videoid",
+					"fromPath": [
+						"videoid"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "title",
+					"fromPath": [
+						"title"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "viewcount",
+					"fromPath": [
+						"viewcount"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				},
+				{
+					"toKey": "publishdate",
+					"fromPath": [
+						"publishdate"
+					],
+					"toType": "string",
+					"fromType": "string",
+					"dropped": false,
+					"children": null
+				}
+			],
+			"parentsValid": true,
+			"calculatedType": "",
+			"codeGenVersion": 2
+		},
+		"node-1723122293603": {
+			"nodeId": "node-1723122293603",
+			"dataPreview": false,
+			"previewAmount": 0,
+			"inputs": [
+				"node-1723122288487"
+			],
+			"name": "Drop Duplicates",
+			"generatedNodeName": "DropDuplicates_node1723122293603",
+			"classification": "Transform",
+			"type": "DropDuplicates",
+			"parentsValid": true,
+			"calculatedType": "",
+			"columns": [],
+			"codeGenVersion": 2
+		}
+	},
+	"hasBeenSaved": false,
+	"usageProfileName": null
+}
