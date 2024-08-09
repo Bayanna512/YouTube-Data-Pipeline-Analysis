@@ -26,7 +26,8 @@ Data Pipeline Solution :
 - Popular Video Details (S3 to Redshift): `t_s3_rs_popular_video_details`
 
   4) DAGs :
-     -- youtube_data_extraction_dag
+     - youtube_data_extraction_dag
+     - s3_to_redshift_data_pipeline_dag
      
 
 Data Architecture
