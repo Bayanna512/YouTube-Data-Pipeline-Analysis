@@ -1,0 +1,73 @@
+{
+	"jobConfig": {
+		"name": "youtube_video_details_job",
+		"description": "to fetch youtube video details:\n\n# S3 details\nS3_BUCKET = 'sphtest512'\nAPI_KEYS_S3_KEY = 'data/API_keys.json'\nCHANNEL_DETAILS_S3_KEY = 'data/channel_details.csv'\nVIDEO_DETAILS_S3_KEY = 'data/video_details/",
+		"role": "arn:aws:iam::014498657303:role/service-role/AWSGlueServiceRole",
+		"command": "glueetl",
+		"version": "4.0",
+		"runtime": null,
+		"workerType": "G.8X",
+		"numberOfWorkers": 10,
+		"maxCapacity": 80,
+		"maxRetries": 0,
+		"timeout": 2880,
+		"maxConcurrentRuns": 1,
+		"security": "none",
+		"scriptName": "youtube_video_details_job.py",
+		"scriptLocation": "s3://aws-glue-assets-014498657303-us-east-1/scripts/",
+		"language": "python-3",
+		"spark": false,
+		"sparkConfiguration": "standard",
+		"jobParameters": [
+			{
+				"key": "--API_KEY_FILE",
+				"value": "data/API_keys.json",
+				"existing": false
+			},
+			{
+				"key": "--CHANNEL_DETAILS_FILE",
+				"value": "data/channel_details/channel_details.csv",
+				"existing": false
+			},
+			{
+				"key": "--JOB_NAME",
+				"value": "youtube_video_details_job",
+				"existing": false
+			},
+			{
+				"key": "--S3_BUCKET",
+				"value": "sphtest512",
+				"existing": false
+			},
+			{
+				"key": "--end_date",
+				"value": "2024-08-10",
+				"existing": false
+			},
+			{
+				"key": "--start_date",
+				"value": "2023-08-11",
+				"existing": false
+			}
+		],
+		"tags": [],
+		"jobMode": "DEVELOPER_MODE",
+		"createdOn": "2024-08-03T18:23:37.506Z",
+		"developerMode": true,
+		"connectionsList": [],
+		"temporaryDirectory": "s3://aws-glue-assets-014498657303-us-east-1/temporary/",
+		"logging": true,
+		"glueHiveMetastore": true,
+		"etlAutoTuning": false,
+		"metrics": true,
+		"observabilityMetrics": true,
+		"bookmark": "job-bookmark-disable",
+		"sparkPath": "s3://aws-glue-assets-014498657303-us-east-1/sparkHistoryLogs/",
+		"flexExecution": false,
+		"minFlexWorkers": null,
+		"maintenanceWindow": null
+	},
+	"hasBeenSaved": false,
+	"usageProfileName": null,
+	"script": "import requests  # For making HTTP requests to the YouTube Data API\r\nimport sys  # For interacting with the system, particularly for command-line arguments\r\nimport json  # For parsing JSON data\r\nimport boto3  # AWS SDK for Python to interact with AWS services like S3\r\nfrom datetime import datetime  # For handling dates and times\r\nfrom awsglue.utils import getResolvedOptions  # For retrieving job parameters in AWS Glue\r\nfrom pyspark.context import SparkContext  # For initializing the Spark context\r\nfrom awsglue.context import GlueContext  # For initializing the AWS Glue context\r\nfrom pyspark.sql import SparkSession  # For creating and managing Spark SQL DataFrames\r\nfrom pyspark.sql.functions import col, to_timestamp, lit  # For manipulating DataFrame columns\r\nimport pandas as pd  # For handling CSV data\r\nimport html  # For HTML escaping/decoding\r\nfrom io import BytesIO  # For handling byte streams\r\n\r\n# Retrieve job parameters passed to the Glue job\r\nargs = getResolvedOptions(sys.argv, ['JOB_NAME', 'S3_BUCKET', 'API_KEY_FILE', 'CHANNEL_DETAILS_FILE', 'start_date', 'end_date'])\r\n\r\n# Initialize Spark and Glue contexts\r\nsc = SparkContext()  # Creates a SparkContext for Spark operations\r\nglueContext = GlueContext(sc)  # Creates a GlueContext for Glue-specific operations\r\nspark = glueContext.spark_session  # Creates a SparkSession to work with Spark SQL\r\n\r\n# Initialize S3 client to interact with AWS S3\r\ns3_client = boto3.client('s3')\r\n\r\ndef fetch_api_keys(bucket, key):\r\n    \"\"\"Fetches API keys from the S3 bucket.\"\"\"\r\n    response = s3_client.get_object(Bucket=bucket, Key=key)  # Retrieves the object from S3\r\n    api_keys_data = json.loads(response['Body'].read().decode('utf-8'))  # Parses the JSON data\r\n    return api_keys_data['VIDEO_API_KEYS']  # Returns the list of API keys\r\n\r\ndef fetch_channel_ids(bucket, key):\r\n    \"\"\"Fetches channel IDs from a CSV file in the S3 bucket.\"\"\"\r\n    response = s3_client.get_object(Bucket=bucket, Key=key)  # Retrieves the CSV file from S3\r\n    csv_data = response['Body'].read().decode('utf-8')  # Reads and decodes the CSV data\r\n    \r\n    # Load CSV data into a Pandas DataFrame\r\n    pandas_df = pd.read_csv(BytesIO(csv_data.encode('utf-8')))\r\n    \r\n    # Convert Pandas DataFrame to Spark DataFrame\r\n    spark_df = spark.createDataFrame(pandas_df)\r\n    \r\n    # Collect channel IDs into a dictionary\r\n    channel_ids = spark_df.select(\"ChannelName\", \"ChannelID\").rdd.collectAsMap()\r\n    \r\n    return channel_ids  # Returns the dictionary of channel names and IDs\r\n\r\ndef fetch_videos_with_api_key(channel_id, api_key, start_date, end_date, max_videos, next_page_token=None, fetched_video_ids=None):\r\n    \"\"\"Fetches video details from YouTube API for a given channel and API key.\"\"\"\r\n    if fetched_video_ids is None:\r\n        fetched_video_ids = set()  # Initialize set for tracking fetched video IDs\r\n\r\n    videos = []  # List to store video details\r\n    base_url = f'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&channelId={channel_id}&order=date&key={api_key}&publishedAfter={start_date}T00:00:00Z&publishedBefore={end_date}T23:59:59Z'\r\n    url = base_url if not next_page_token else f'{base_url}&pageToken={next_page_token}'\r\n    fetched_count = 0  # Counter for fetched videos\r\n\r\n    while url and fetched_count < max_videos:\r\n        response = requests.get(url)  # Make a request to the YouTube API\r\n        data = response.json()  # Parse the JSON response\r\n\r\n        if 'error' in data:\r\n            if data['error']['errors'][0]['reason'] == 'quotaExceeded':\r\n                print(f\"Quota exceeded for API key {api_key}. Moving to the next API key.\")\r\n                return videos, True, fetched_video_ids, next_page_token  # Return with quota exceeded flag\r\n\r\n            print(f\"Error fetching data: {data['error']['message']}\")\r\n            break  # Exit loop on error\r\n\r\n        for item in data.get('items', []):\r\n            if fetched_count >= max_videos:\r\n                break\r\n            video_id = item['id']['videoId']\r\n            if video_id in fetched_video_ids:\r\n                continue  # Skip if video already fetched\r\n\r\n            video_title = item['snippet']['title']\r\n            publish_date = item['snippet'].get('publishedAt')\r\n            video_details_url = f'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}'\r\n            video_response = requests.get(video_details_url)\r\n            video_data = video_response.json()\r\n\r\n            if 'error' in video_data:\r\n                print(f\"Error fetching video details: {video_data['error']['message']}\")\r\n                continue  # Skip if there is an error fetching video details\r\n\r\n            video_title = html.unescape(video_title)  # Decode HTML entities in title\r\n            video_stats = video_data.get('items', [{}])[0].get('statistics', {})\r\n            view_count = int(video_stats.get('viewCount', 0))\r\n\r\n            if publish_date:\r\n                videos.append({\r\n                    'ChannelID': channel_id,\r\n                    'VideoID': video_id,\r\n                    'Title': video_title,\r\n                    'PublishDate': publish_date,\r\n                    'ViewCount': view_count\r\n                })\r\n\r\n            fetched_video_ids.add(video_id)  # Add video ID to the set\r\n            fetched_count += 1  # Increment counter\r\n\r\n        next_page_token = data.get('nextPageToken')  # Get the next page token for pagination\r\n        if next_page_token and fetched_count < max_videos:\r\n            url = f'{base_url}&pageToken={next_page_token}'\r\n        else:\r\n            url = None\r\n\r\n    return videos, not next_page_token, fetched_video_ids, next_page_token\r\n\r\ndef fetch_and_store_youtube_data(start_date, end_date):\r\n    \"\"\"Fetches video data from YouTube and stores it in S3 in Parquet format.\"\"\"\r\n    S3_BUCKET = args['S3_BUCKET']\r\n    API_KEY_FILE = args['API_KEY_FILE']\r\n    CHANNEL_DETAILS_FILE = args['CHANNEL_DETAILS_FILE']\r\n\r\n    # Fetch API keys and channel details\r\n    api_keys = fetch_api_keys(S3_BUCKET, API_KEY_FILE)\r\n    channel_ids = fetch_channel_ids(S3_BUCKET, CHANNEL_DETAILS_FILE)\r\n\r\n    all_video_data = []  # List to store all video data\r\n    max_videos_per_key = 5000  # Maximum number of videos to fetch per API key\r\n    fetched_video_ids = set()  # Set to track fetched video IDs\r\n\r\n    for channel_name, channel_id in channel_ids.items():\r\n        api_key_index = 0\r\n        next_page_token = None\r\n\r\n        while api_key_index < len(api_keys):\r\n            api_key = api_keys[api_key_index]\r\n            try:\r\n                videos, quota_exceeded, fetched_video_ids, next_page_token = fetch_videos_with_api_key(channel_id, api_key, start_date, end_date, max_videos_per_key, next_page_token, fetched_video_ids)\r\n                all_video_data.extend(videos)  # Add fetched videos to the list\r\n\r\n                if quota_exceeded:\r\n                    api_key_index += 1  # Move to the next API key\r\n                    continue\r\n\r\n                break\r\n            except Exception as e:\r\n                print(f\"Exception occurred while processing channel {channel_id} with API key {api_key}: {str(e)}\")\r\n                api_key_index += 1  # Move to the next API key\r\n\r\n    # Convert the list of video data to a Spark DataFrame\r\n    df = spark.createDataFrame(all_video_data)\r\n    df = df.withColumn('PublishDate', to_timestamp(col('PublishDate')))  # Convert 'PublishDate' to timestamp format\r\n\r\n    # Extract year, month, and day for partitioning\r\n    df = df.withColumn('Year', col('PublishDate').substr(1, 4))\r\n    df = df.withColumn('Month', col('PublishDate').substr(6, 2))\r\n    df = df.withColumn('Day', col('PublishDate').substr(9, 2))\r\n\r\n    # Write the DataFrame to S3 in Parquet format, partitioned by Year, Month, and Day\r\n    df.write.partitionBy('Year', 'Month', 'Day').parquet(f\"s3://{S3_BUCKET}/data/video_details/\", mode='overwrite')\r\n\r\n# Start and end dates from job parameters\r\nstart_date = args['start_date']\r\nend_date = args['end_date']\r\nfetch_and_store_youtube_data(start_date, end_date)  # Call the function to fetch and store data\r\n"
+}
