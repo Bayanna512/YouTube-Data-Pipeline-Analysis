@@ -88,8 +88,3 @@ Data extraction and API interactions occur within the AWS Glue job. Data transfo
 Data is partitioned by Year, Month, and Day to optimize query performance and manageability. This partitioning scheme supports efficient querying and retrieval of data.
 The code uses VARCHAR for text fields and BIGINT for numeric fields and timestamp for pubshdate in Redshift. Data is stored in Parquet format in S3, which supports efficient compression and columnar storage.
 The approach includes handling API quotas by rotating through multiple API keys and managing pagination to ensure all relevant data is fetched. The solution uses AWS Glue for ETL operations, leveraging its integration with Spark for processing and transforming data. The final output is in Parquet format, which is optimized for both storage and query performance.
-
-
-Algorithms
-- Outlier Detection: Identifying videos with views significantly higher than average.
-
