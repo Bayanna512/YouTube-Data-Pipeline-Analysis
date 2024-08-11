@@ -8,43 +8,41 @@ This repository contains a case study for building a data pipeline to ingest, tr
 
  Repository Structure:
 
- /YouTube-Data-Pipeline-Analysis
+ YouTube-Data-Pipeline-Analysis
 │
-├── /docs
+├── docs
 │   ├── data_model_diagram.pdf
 │   └── README.md
 │
-├── /src
-│   ├── /dags
+├── src
+│   ├── dags
 │   │   ├── youtube_data_extraction_dag.py
-│   │   ├── s3_to_redshift_data_pipeline_dag.py
+│   │   └── s3_to_redshift_data_pipeline_dag.py
 │   │
-│   ├── /scripts
-│   │   ├── glue_channel_ids_extraction_job.py
-│   │   ├── glue_channel_details_extraction_job.py
-│   │   ├── youtube_video_details_job.py
-│   │   ├── glue_popular_video_details_extraction_job.py
-│   │   ├── test_etl1.json
-│   │   ├── t_s3_rs_video_details.json
-│   │   ├── t_s3_rs_popular_video_details.json
-│   │
-│   └── /configs
-│       └── api_keys.json
+│   └── scripts
+│       ├── glue_channel_ids_extraction_job.py
+│       ├── glue_channel_details_extraction_job.py
+│       ├── youtube_video_details_job.py
+│       ├── glue_popular_video_details_extraction_job.py
+│       ├── test_etl1.json
+│       ├── t_s3_rs_video_details.json
+│       ├── t_s3_rs_popular_video_details.json
+│       └── t_s3_rs_channel_details.json
 │
-├── /data
-│   ├── /s3
+├── data
+│   ├── s3
 │   │   ├── channel_ids.csv
 │   │   ├── channel_details.csv
 │   │   ├── video_details.parquet
 │   │   └── popular_video_details.csv
 │   │
-│   └── /redshift
+│   └── redshift
 │       ├── channel_details_table.sql
 │       ├── video_details_table.sql
 │       ├── popular_video_details_table.sql
-│       ├── reporting_queries.sql
-│       └── /results
-│           └── result.xlsx
+│       ├── results
+│       │   └── result.xlsx
+│       └── reporting_queries.sql
 │
 └── README.md
 
