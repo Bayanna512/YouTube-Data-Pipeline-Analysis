@@ -50,13 +50,13 @@ Data Model
 
 Technical Knowledge, Approach, and Algorithms
 
-Technical Challenges
-- API Quota Management: Handling API rate limits and quotas by using sequential API keys.
-
-
-Approach
-- Batch Processing: Use AWS Glue for batch processing of data.
-
+The data flow is planned to efficiently fetch video details from the YouTube API, handle pagination, and store the results in S3. The pipeline involves fetching API keys, channel IDs, and video details, processing them, and finally storing them in a Parquet format in S3.
+The pipeline is designed to be scalable by using multiple API keys to handle quota limits and employing pagination to fetch large volumes of data. It is maintainable due to its modular functions: fetch_api_keys, fetch_channel_ids, and fetch_videos_with_api_key, which handle distinct tasks.
+Data is structured with essential fields like ChannelID, VideoID, Title, PublishDate, and ViewCount. The ingestion pipeline maintains data integrity by processing and storing video details in a structured format.
+Data extraction and API interactions occur within the AWS Glue job. Data transformation (e.g., date formatting) is done within the Glue script, while data storage and partitioning are managed when writing to S3 in Parquet format.
+Data is partitioned by Year, Month, and Day to optimize query performance and manageability. This partitioning scheme supports efficient querying and retrieval of data.
+The code uses VARCHAR for text fields and BIGINT for numeric fields and timestamp for pubshdate in Redshift. Data is stored in Parquet format in S3, which supports efficient compression and columnar storage.
+The approach includes handling API quotas by rotating through multiple API keys and managing pagination to ensure all relevant data is fetched. The solution uses AWS Glue for ETL operations, leveraging its integration with Spark for processing and transforming data. The final output is in Parquet format, which is optimized for both storage and query performance.
 
 
 Algorithms
