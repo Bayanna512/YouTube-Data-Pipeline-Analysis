@@ -30,12 +30,6 @@ Data Pipeline Solution :
      - s3_to_redshift_data_pipeline_dag
      
 
-Data Architecture
-
-Architecture Diagram
-[Architecture Diagram](docs/architecture_diagram.png)
-
-
 
 Data Flow Description
 1. Data Ingestion: Glue jobs fetch data from YouTube API and store it in S3 buckets.
