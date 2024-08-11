@@ -6,6 +6,49 @@ This repository contains a case study for building a data pipeline to ingest, tr
  The pipeline includes data ingestion from the YouTube API, transformation with AWS Glue, and storage in Amazon Redshift.
  The final reports are generated through SQL queries on Redshift.
 
+ Repository Structure:
+
+ /YouTube-Data-Pipeline-Analysis
+│
+├── /docs
+│   ├── data_model_diagram.pdf
+│   └── README.md
+│
+├── /src
+│   ├── /dags
+│   │   ├── youtube_data_extraction_dag.py
+│   │   ├── s3_to_redshift_data_pipeline_dag.py
+│   │
+│   ├── /scripts
+│   │   ├── glue_channel_ids_extraction_job.py
+│   │   ├── glue_channel_details_extraction_job.py
+│   │   ├── youtube_video_details_job.py
+│   │   ├── glue_popular_video_details_extraction_job.py
+│   │   ├── test_etl1.json
+│   │   ├── t_s3_rs_video_details.json
+│   │   ├── t_s3_rs_popular_video_details.json
+│   │
+│   └── /configs
+│       └── api_keys.json
+│
+├── /data
+│   ├── /s3
+│   │   ├── channel_ids.csv
+│   │   ├── channel_details.csv
+│   │   ├── video_details.parquet
+│   │   └── popular_video_details.csv
+│   │
+│   └── /redshift
+│       ├── channel_details_table.sql
+│       ├── video_details_table.sql
+│       ├── popular_video_details_table.sql
+│       ├── reporting_queries.sql
+│       └── /results
+│           └── result.xlsx
+│
+└── README.md
+
+
 Data Pipeline Solution :
 
 1. Data Pipeline Overview
