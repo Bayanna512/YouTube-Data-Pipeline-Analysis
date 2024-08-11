@@ -48,10 +48,34 @@ Data Model
 - Video Details Table: `videoid`, `title`, `channelid`, `publishdate`, `viewcount`
 - Popular Video Details Table: `videoid`, `title`, `channelid`, `viewcount`, `publishdate`
 
-- ![image](https://github.com/user-attachments/assets/69468e62-34d8-4d15-b8f0-c2e8b865f617)
--![image](https://github.com/user-attachments/assets/24061ed3-8bb0-4d57-aef1-acc3e40d1d27)
--![image](https://github.com/user-attachments/assets/a2a5689c-f560-4f7f-aad7-52498e49c662)
-
+Channel Details			
+Column Name	Data Type	Description	keys
+channelid	VARCHAR(50)	Unique identifier for the channel.	Primary Key
+channelname	VARCHAR(255)	Name of the channel.	
+subscribercount	BIGINT	Number of subscribers.	
+videocount	BIGINT	Total number of videos.	
+			
+			
+			
+Video Details			
+Column Name	Data Type	Description	Notes
+videoid	VARCHAR(255)	Unique identifier for the video.	Primary Key
+channelid	VARCHAR(255)	Foreign key referencing channelid from channel_details.	Foreign Key
+title	VARCHAR(1000)	Title of the video.	
+publishdate	TIMESTAMP	Date and time when the video was published.	
+viewcount	BIGINT	Number of views the video has received.	
+			
+			
+Popular Video Details			
+Column Name	Data Type	Description	Notes
+videoid	VARCHAR(255)	Unique identifier for the video.	Primary Key
+channelid	VARCHAR(255)	Foreign key referencing channelid from channel_details.	Foreign Key
+title	VARCHAR(1000)	Title of the video.	
+viewcount	BIGINT	Number of views the video has received.	
+publishdate	TIMESTAMP	Date and time when the video was published.	
+publishdate_string	VARCHAR(65535)	String representation of the publish date.	
+viewcount_string	VARCHAR(65535)	String representation of the view count.	
+![image](https://github.com/user-attachments/assets/bbe747ee-f8c3-4482-a338-5fe1524fe9a4)
 
 
 
