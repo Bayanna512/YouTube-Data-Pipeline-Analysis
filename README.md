@@ -48,6 +48,13 @@ Data Model
 - Video Details Table: `videoid`, `title`, `channelid`, `publishdate`, `viewcount`
 - Popular Video Details Table: `videoid`, `title`, `channelid`, `viewcount`, `publishdate`
 
+- ![image](https://github.com/user-attachments/assets/69468e62-34d8-4d15-b8f0-c2e8b865f617)
+-![image](https://github.com/user-attachments/assets/24061ed3-8bb0-4d57-aef1-acc3e40d1d27)
+-![image](https://github.com/user-attachments/assets/a2a5689c-f560-4f7f-aad7-52498e49c662)
+
+
+
+
 Technical Knowledge, Approach, and Algorithms
 
 The data flow is planned to efficiently fetch video details from the YouTube API, handle pagination, and store the results in S3. The pipeline involves fetching API keys, channel IDs, and video details, processing them, and finally storing them in a Parquet format in S3.
