@@ -23,7 +23,6 @@ spark = glueContext.spark_session  # Creates a SparkSession to work with Spark S
 s3_client = boto3.client('s3')
 
 def fetch_api_keys(bucket, key):
- def fetch_api_keys(bucket, key):
     """Fetches API keys from a CSV file in the S3 bucket."""
     s3_path = f"s3://{bucket}/{key}"  # Construct the S3 URI for the file
 
