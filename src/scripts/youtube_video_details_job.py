@@ -8,7 +8,6 @@ from pyspark.context import SparkContext  # For initializing the Spark context
 from awsglue.context import GlueContext  # For initializing the AWS Glue context
 from pyspark.sql import SparkSession  # For creating and managing Spark SQL DataFrames
 from pyspark.sql.functions import col, to_timestamp, lit  # For manipulating DataFrame columns
-import pandas as pd  # For handling CSV data
 import html  # For HTML escaping/decoding
 from io import BytesIO  # For handling byte streams
 
@@ -24,25 +23,28 @@ spark = glueContext.spark_session  # Creates a SparkSession to work with Spark S
 s3_client = boto3.client('s3')
 
 def fetch_api_keys(bucket, key):
-    """Fetches API keys from the S3 bucket."""
-    response = s3_client.get_object(Bucket=bucket, Key=key)  # Retrieves the object from S3
-    api_keys_data = json.loads(response['Body'].read().decode('utf-8'))  # Parses the JSON data
-    return api_keys_data['VIDEO_API_KEYS']  # Returns the list of API keys
+ def fetch_api_keys(bucket, key):
+    """Fetches API keys from a CSV file in the S3 bucket."""
+    s3_path = f"s3://{bucket}/{key}"  # Construct the S3 URI for the file
+
+    # Load CSV data into a Spark DataFrame
+    spark_df = spark.read.csv(s3_path, header=True, inferSchema=True)
+
+    # Collect API keys into a list
+    api_keys = spark_df.select("APIKey").rdd.flatMap(lambda x: x).collect()
+
+    return api_keys  # Returns the list of API keys
 
 def fetch_channel_ids(bucket, key):
     """Fetches channel IDs from a CSV file in the S3 bucket."""
-    response = s3_client.get_object(Bucket=bucket, Key=key)  # Retrieves the CSV file from S3
-    csv_data = response['Body'].read().decode('utf-8')  # Reads and decodes the CSV data
-    
-    # Load CSV data into a Pandas DataFrame
-    pandas_df = pd.read_csv(BytesIO(csv_data.encode('utf-8')))
-    
-    # Convert Pandas DataFrame to Spark DataFrame
-    spark_df = spark.createDataFrame(pandas_df)
-    
+    s3_path = f"s3://{bucket}/{key}"  # Construct the S3 URI for the file
+
+    # Load CSV data directly into a Spark DataFrame
+    spark_df = spark.read.csv(s3_path, header=True, inferSchema=True)
+
     # Collect channel IDs into a dictionary
     channel_ids = spark_df.select("ChannelName", "ChannelID").rdd.collectAsMap()
-    
+
     return channel_ids  # Returns the dictionary of channel names and IDs
 
 def fetch_videos_with_api_key(channel_id, api_key, start_date, end_date, max_videos, next_page_token=None, fetched_video_ids=None):
